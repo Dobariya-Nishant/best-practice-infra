@@ -1,13 +1,13 @@
 resource "aws_instance" "this" {
-  ami           = data.aws_ami.this.id
-  instance_type = var.instance_type
-  subnet_id     = var.subnet_id
-  key_name      = aws_key_pair.this.key_name
-  security_groups = [aws_security_group.this.id]
+  ami                         = data.aws_ami.this.id
+  instance_type               = var.instance_type
+  subnet_id                   = var.subnet_id
+  key_name                    = aws_key_pair.this.key_name
+  security_groups             = [aws_security_group.this.id]
   associate_public_ip_address = true
 
   ebs_block_device {
-    device_name = "/dev/xvda"
+    device_name           = "/dev/xvda"
     volume_size           = var.ebs_size
     volume_type           = var.ebs_type
     delete_on_termination = true

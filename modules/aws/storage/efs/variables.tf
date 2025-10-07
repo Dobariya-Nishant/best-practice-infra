@@ -28,5 +28,5 @@ variable "subnet_ids" {
 }
 
 variable "access_points" {
-  type        = map(string)
+  type = map(string)
 }

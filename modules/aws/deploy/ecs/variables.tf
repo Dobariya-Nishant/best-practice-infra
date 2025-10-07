@@ -24,8 +24,8 @@ variable "environment" {
 variable "auto_scaling_groups" {
   description = "Map of ASGs with their configs (optional)"
   type = map(object({
-    name = string
-    arn = string
+    name            = string
+    arn             = string
     target_capacity = optional(number, 80)
   }))
   default = {}

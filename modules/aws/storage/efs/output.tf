@@ -11,10 +11,10 @@ output "arn" {
 }
 
 output "access_points_ids" {
-  value =  {
+  value = {
     for k, ap in aws_efs_access_point.this :
     k => {
-      id  = ap.id
+      id = ap.id
     }
   }
 }

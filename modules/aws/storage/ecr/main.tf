@@ -11,7 +11,7 @@ resource "aws_ecr_repository" "this" {
   }
 
   tags = {
-    Name  = "${var.name}-ecr-${var.environment}"
+    Name = "${var.name}-ecr-${var.environment}"
   }
 }
 
@@ -25,9 +25,9 @@ resource "aws_ecr_lifecycle_policy" "this" {
         rulePriority = 1
         description  = "Keep last 10 images, expire older ones"
         selection = {
-          tagStatus     = "any"
-          countType     = "imageCountMoreThan"
-          countNumber   = 10
+          tagStatus   = "any"
+          countType   = "imageCountMoreThan"
+          countNumber = 10
         }
         action = {
           type = "expire"

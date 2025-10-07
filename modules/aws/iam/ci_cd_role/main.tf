@@ -51,12 +51,12 @@ resource "aws_iam_role_policy_attachment" "codedeploy_access" {
 
 resource "aws_iam_role_policy_attachment" "cloudwatch_access" {
   role       = aws_iam_role.ci_cd.name
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"  
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_access" {
   role       = aws_iam_role.ci_cd.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonECS_FullAccess"  
+  policy_arn = "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
 }
 
 

@@ -34,7 +34,7 @@ variable "subnet_ids" {
 variable "assign_public_ip" {
   description = "List of subnet IDs for the Auto Scaling Group to launch instances in. Determines availability zones."
   type        = bool
-  default = false
+  default     = false
 }
 
 # ====================
@@ -101,6 +101,7 @@ variable "user_data" {
 variable "ecs_cluster_name" {
   description = "Name of the ECS cluster to register the EC2 instances to. If set, ECS-specific AMI and user data will be used."
   type        = string
+  default     = null
 }
 
 # ==================

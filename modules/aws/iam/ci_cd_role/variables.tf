@@ -2,7 +2,7 @@
 # Core Project Configuration
 # ==========================
 variable "name" {
-  type        = string
+  type = string
 }
 
 variable "project_name" {

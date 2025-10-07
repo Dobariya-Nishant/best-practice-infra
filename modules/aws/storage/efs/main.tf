@@ -3,7 +3,7 @@
 # ==================
 resource "aws_efs_file_system" "this" {
   performance_mode = "generalPurpose"
-  encrypted       = true
+  encrypted        = true
 
   lifecycle_policy {
     # automatically move files not accessed for 30 days to EFS IA
@@ -58,7 +58,7 @@ resource "aws_security_group" "efs_sg" {
 # 🔐 Security Group for EFS
 # =========================
 resource "aws_efs_access_point" "this" {
-  for_each = var.access_points
+  for_each       = var.access_points
   file_system_id = aws_efs_file_system.this.id # your EFS id
 
   root_directory {
