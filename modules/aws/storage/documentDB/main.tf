@@ -7,7 +7,7 @@ resource "aws_docdb_cluster" "this" {
   db_subnet_group_name   = aws_docdb_subnet_group.this.name
   vpc_security_group_ids = [aws_security_group.this.id]
   skip_final_snapshot    = var.skip_final_snapshot # dev/test only
-
+  
   tags = {
     Name = "${var.name}-db-cluster-${var.environment}"
   }
@@ -40,15 +40,12 @@ resource "aws_security_group" "this" {
   name   = "${var.name}-db-sg-${var.environment}"
   vpc_id = var.vpc_id
 
-  dynamic "ingress" {
-    for_each = var.allowed_ip != null ? [1] : []
-    content {
-      description = "Allow HTTPS"
-      from_port   = 27017
-      to_port     = 27017
-      protocol    = "tcp"
-      cidr_blocks = ["${var.allowed_ip}/32"]
-    }
+  ingress {
+    description = "Allow HTTPS"
+    from_port   = 27017
+    to_port     = 27017
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {

@@ -10,6 +10,8 @@ resource "aws_ecs_service" "this" {
   desired_count                     = var.desired_count
   health_check_grace_period_seconds = try(var.health_check_grace_period_seconds, 100)
 
+  launch_type = var.capacity_provider_name != null ? "EC2" : "FARGATE"
+  
   network_configuration {
     subnets          = var.subnet_ids
     security_groups  = [aws_security_group.this.id]
@@ -18,7 +20,7 @@ resource "aws_ecs_service" "this" {
 
   # Capacity provider strategy if provided, else FARGATE
   dynamic "capacity_provider_strategy" {
-    for_each = var.capacity_provider_name != null ? [var.capacity_provider_name] : ["FARGATE"]
+    for_each = var.capacity_provider_name != null ? [var.capacity_provider_name] : []
     content {
       capacity_provider = capacity_provider_strategy.value
       weight            = 1
@@ -146,43 +148,4 @@ resource "aws_security_group" "this" {
   tags = {
     Name = "${var.name}-sv-sg-${var.environment}"
   }
-}
-
-# ====================
-# IAM Roles & Policies
-# ====================
-
-# IAM role trust policy for ECS task execution role
-data "aws_iam_policy_document" "ecs_task_execution_role" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type        = "Service"
-      identifiers = ["ecs-tasks.amazonaws.com"]
-    }
-
-    actions = ["sts:AssumeRole"]
-  }
-}
-
-# AWS managed policy for ECS task execution role
-data "aws_iam_policy" "ecs_task_execution_role_policy" {
-  name = "AmazonECSTaskExecutionRolePolicy"
-}
-
-# ECS Task Execution IAM Role
-resource "aws_iam_role" "ecs_task_execution_role" {
-  name               = "${var.name}-task-execution-role-${var.environment}"
-  assume_role_policy = data.aws_iam_policy_document.ecs_task_execution_role.json
-
-  tags = {
-    Name = "${var.name}-task-execution-role-${var.environment}"
-  }
-}
-
-# Attach managed execution policy to role
-resource "aws_iam_role_policy_attachment" "task_execution_policy_attach" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = data.aws_iam_policy.ecs_task_execution_role_policy.arn
 }

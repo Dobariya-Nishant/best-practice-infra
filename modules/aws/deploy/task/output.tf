@@ -1,9 +1,9 @@
-output "task_definition_arn" {
+output "arn" {
   description = "ARN of the ECS Task Definition."
   value       = aws_ecs_task_definition.this.arn
 }
 
-output "task_definition_family" {
+output "family" {
   description = "Family name of the ECS Task Definition."
   value       = aws_ecs_task_definition.this.family
 }

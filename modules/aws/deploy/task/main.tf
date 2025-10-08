@@ -8,7 +8,7 @@ resource "aws_ecs_task_definition" "this" {
   memory                   = var.memory
   network_mode             = var.network_mode
   requires_compatibilities = var.requires_compatibilities
-  execution_role_arn       = var.execution_role_arn
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = var.task_role_arn
 
   # ==========================
@@ -43,7 +43,7 @@ resource "aws_ecs_task_definition" "this" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = var.log_group_name
+          awslogs-group         = aws_cloudwatch_log_group.this.name
           awslogs-region        = var.aws_region
           awslogs-stream-prefix = container.name
         }
@@ -63,13 +63,6 @@ resource "aws_ecs_task_definition" "this" {
     content {
       name = volume.value.name
 
-      dynamic "host_path" {
-        for_each = lookup(volume.value, "host_path", null) != null ? [1] : []
-        content {
-          path = volume.value.host_path
-        }
-      }
-
       dynamic "efs_volume_configuration" {
         for_each = lookup(volume.value, "efs_volume_configuration", null) != null ? [1] : []
         content {
@@ -88,4 +81,48 @@ resource "aws_ecs_task_definition" "this" {
   tags = {
       Name = "${var.name}-task-${var.environment}"
     }
+}
+
+resource "aws_cloudwatch_log_group" "this" {
+  name              = "/ecs/${var.log_group_name}"
+  retention_in_days = 7
+}
+
+# ====================
+# IAM Roles & Policies
+# ====================
+
+# IAM role trust policy for ECS task execution role
+data "aws_iam_policy_document" "ecs_task_execution_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["ecs-tasks.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+# AWS managed policy for ECS task execution role
+data "aws_iam_policy" "ecs_task_execution_role_policy" {
+  name = "AmazonECSTaskExecutionRolePolicy"
+}
+
+# ECS Task Execution IAM Role
+resource "aws_iam_role" "ecs_task_execution_role" {
+  name               = "${var.name}-task-execution-role-${var.environment}"
+  assume_role_policy = data.aws_iam_policy_document.ecs_task_execution_role.json
+
+  tags = {
+    Name = "${var.name}-task-execution-role-${var.environment}"
+  }
+}
+
+# Attach managed execution policy to role
+resource "aws_iam_role_policy_attachment" "task_execution_policy_attach" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = data.aws_iam_policy.ecs_task_execution_role_policy.arn
 }

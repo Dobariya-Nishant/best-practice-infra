@@ -13,7 +13,7 @@ terraform {
 inputs = {
   name             = "api"
   desired_capacity = 1
-  max_size         = 0
+  max_size         = 1
   min_size         = 1
   instance_type    = "t3.micro"
   ebs_size         = 30

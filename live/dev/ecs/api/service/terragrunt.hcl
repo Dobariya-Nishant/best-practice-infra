@@ -20,34 +20,56 @@ dependency "ecs" {
   }
 }
 
-dependency "api_asg" {
-  config_path = "${dirname(find_in_parent_folders("env.hcl"))}/ecs/api/asg"
+dependency "alb" {
+  config_path = "${dirname(find_in_parent_folders("env.hcl"))}/alb"
 
   mock_outputs = {
-    id   = "api-asg-id"
-    name = "api-asg-name"
+    id                 = "mock-alb-id"
+    sg_id              = "mock-alb-sg-id"
+    https_listener_arn = "arn:aws:autoscaling:us-east-1:123456789012:mock:uuid:mock/mock"
+    blue_tg = {
+      api = {
+        name = "mock-tg-name"
+        arn  = "arn:aws:autoscaling:us-east-1:123456789012:mock:uuid:mock/mock"
+      }
+    }
+    green_tg = {
+      api = {
+        name = "mock-tg-name"
+        arn  = "arn:aws:autoscaling:us-east-1:123456789012:mock:uuid:mock/mock"
+      }
+    }
+  }
+}
+
+dependency "task" {
+  config_path = "${dirname(find_in_parent_folders("env.hcl"))}/ecs/api/task"
+
+  mock_outputs = {
+    revision   = "1"
+    family = "mock-api"
     arn  = "arn:aws:autoscaling:us-east-1:123456789012:autoScalingGroup:uuid:autoScalingGroupName/api"
   }
 }
 
-
-
 inputs = {
   name = "api"
+  desired_count = 1
 
   ecs_cluster_id = dependency.ecs.outputs.id
   ecs_cluster_name = dependency.ecs.outputs.name
-  ecs_task_definition_arn 
-  desired_count = 1
+  # capacity_provider_name = dependency.ecs.outputs.asg_cp["api"].arn
 
-  capacity_provider_name = dependency.api_asg.outputs.name
+  ecs_task_definition_arn  = dependency.task.outputs.arn
+
+  
   enable_code_deploy = true
 
   load_balancer_config = {
-    container_name        = string
-    blue_target_group_arn = string
-    container_port        = number
-    sg_id                 = string
+    container_name        = "api"
+    blue_target_group_arn = dependency.alb.outputs.blue_tg["api"].arn
+    container_port        = 80
+    sg_id                 = dependency.alb.outputs.sg_id
   }
 }
 

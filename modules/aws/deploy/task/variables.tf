@@ -2,6 +2,11 @@
 # Core Config
 # ==========================
 
+variable "project_name" {
+  description = "The name of the project. Used consistently for naming, tagging, and organizational purposes across resources."
+  type        = string
+}
+
 variable "name" {
   description = "Base name for ECS Task Definition family."
   type        = string
@@ -41,13 +46,15 @@ variable "requires_compatibilities" {
   default     = ["FARGATE"]
 }
 
-variable "execution_role_arn" {
-  description = "IAM role ARN for ECS task execution (pull images, send logs, etc.)."
-  type        = string
-}
 
 variable "task_role_arn" {
   description = "IAM role ARN for ECS task runtime permissions (S3, DynamoDB, etc.)."
+  type        = string
+  default = null
+}
+
+variable "log_group_name" {
+  description = "CloudWatch Log Group name used for ECS container logs."
   type        = string
 }
 
@@ -145,11 +152,6 @@ EOT
       readOnly        = optional(bool)
     })))
   }))
-}
-
-variable "log_group_name" {
-  description = "CloudWatch Log Group name used for ECS container logs."
-  type        = string
 }
 
 

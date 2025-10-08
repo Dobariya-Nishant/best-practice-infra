@@ -46,7 +46,7 @@ inputs = {
     }
     api = {
       name        = "api"
-      port        = 8081
+      port        = 80
       protocol    = "HTTP"
       target_type = "ip"
     }
